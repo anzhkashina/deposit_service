@@ -1,0 +1,9 @@
+[global]
+DEBUG = true
+ALLOWED_HOSTS = ['127.0.0.1']
+
+[development]
+debug = true
+
+[production]
+debug = false
