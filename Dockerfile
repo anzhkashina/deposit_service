@@ -1,13 +1,31 @@
-FROM python:3.12-slim-buster
+# Используем базовый образ Python 3.12
+FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /app
+# Задаем рабочую директорию
+WORKDIR /deposit_service
 
-COPY pyproject.toml /app/
+# Устанавливаем необходимые зависимости, включая python3 и curl
+RUN apt-get update && apt-get install -y \
+    curl \
+    python3 \
+    python3-pip \
+    python3-venv \
+    && apt-get clean
 
-RUN pip install --no-cache-dir -r pyproject.toml
+# Устанавливаем Poetry
+RUN pip install poetry
 
-COPY . /app/
+RUN poetry config virtualenvs.create false
+
+# Копируем только необходимые файлы для установки зависимостей
+COPY pyproject.toml poetry.lock .
+
+# Устанавливаем зависимости с помощью Poetry
+RUN poetry install --no-root --no-interaction --no-ansi
+
+# Копируем остальные файлы проекта
+COPY . .
 
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

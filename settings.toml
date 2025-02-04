@@ -1,9 +1,12 @@
 [global]
-DEBUG = true
-ALLOWED_HOSTS = ['127.0.0.1']
+debug = false
+allowed_hosts = ["*"]  # Замените '*' на конкретные хосты в production
 
 [development]
 debug = true
+allowed_hosts = ["127.0.0.1"]
+secret_key = ['SECRET_KEY']
 
 [production]
 debug = false
+allowed_hosts = ["example.com"]  # Замените example.com на реальные домены
