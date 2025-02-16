@@ -11,30 +11,24 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-from dynaconf import Dynaconf
-
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+env = environ.Env()
+env.read_env(env_file=str(Path(BASE_DIR, ".env")))
 
 # Quick-start development settings - unsuitable for production
-settings = Dynaconf(
-    env="development",
-    settings_files=[BASE_DIR / "settings.toml"],
-    environments=True,
-    load_dotenv=True,
-)
 
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = settings.SECRET_KEY
+SECRET_KEY = str(env("SECRET_KEY"))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = settings.DEBUG
+DEBUG = str(env("DEBUG"))
 
-ALLOWED_HOSTS = settings.ALLOWED_HOSTS
-
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -58,16 +52,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
-REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly"
-    ],
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
-    ],
-}
 
 ROOT_URLCONF = "deposit_service.urls"
 
@@ -96,14 +80,13 @@ WSGI_APPLICATION = "deposit_service.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "deposit_db",
-        "USER": "postgres",
-        "PASSWORD": "password",
-        "HOST": "db",
-        "PORT": "5432",
+        "NAME": str(env("DATABASE_NAME")),
+        "USER": str(env("DATABASE_USER")),
+        "PASSWORD": str(env("DATABASE_PASSWORD")),
+        "HOST": str(env("DATABASE_HOST")),
+        "PORT": str(env("DATABASE_PORT")),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -145,3 +128,9 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Настройки для REST Framework
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
+    "DEFAULT_PARSER_CLASSES": ("rest_framework.parsers.JSONParser",),
+}
